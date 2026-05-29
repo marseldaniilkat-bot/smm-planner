@@ -117,6 +117,10 @@ export default function Home() {
     setOpen] =
     useState(false);
 
+    const [mobileMenuOpen,
+  setMobileMenuOpen] =
+  useState(false);
+
   const [selectedPost,
     setSelectedPost] =
     useState<any>(null);
@@ -447,8 +451,79 @@ const deleteClient = async (
 
   return (
 
-    <main className="min-h-screen bg-[#f6f3f1] flex">
+   <main className="min-h-screen bg-[#f6f3f1] flex">
+    <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b border-[#ece7e4] px-4 py-3 flex items-center justify-between">
 
+  <button
+  onClick={() =>
+    setMobileMenuOpen(
+      !mobileMenuOpen
+    )
+  }
+  className="text-2xl font-bold"
+>
+  ☰
+</button>
+  <h1 className="font-bold text-lg">
+    SMM Planner
+  </h1>
+
+</div>
+
+{mobileMenuOpen && (
+
+  <div className="md:hidden fixed top-[60px] left-0 w-[260px] h-full bg-white border-r border-[#ece7e4] z-40 p-6">
+
+    <div className="space-y-3">
+
+      {[
+        "Календарь",
+        "Контент",
+        "Идеи",
+        "Клиенты",
+        "Аналитика",
+      ].map((item) => (
+
+        <button
+          key={item}
+          onClick={() => {
+
+            setCurrentPage(item);
+
+            setMobileMenuOpen(false);
+
+          }}
+          className={`w-full text-left px-5 py-4 rounded-2xl ${
+            currentPage === item
+              ? "bg-violet-100 text-violet-700"
+              : "text-[#1d1d1d]"
+          }`}
+        >
+
+          {item}
+
+        </button>
+
+      ))}
+
+      <button
+        onClick={() => {
+
+          setOpen(true);
+
+          setMobileMenuOpen(false);
+
+        }}
+        className="w-full bg-black text-white py-4 rounded-2xl mt-6 font-semibold"
+      >
+        + Создать контент
+      </button>
+
+    </div>
+
+  </div>
+
+)}
       <Sidebar
         onCreate={() =>
           setOpen(true)
@@ -464,7 +539,7 @@ const deleteClient = async (
         }
       />
 
-      <section className="flex-1 p-8 overflow-y-auto">
+      <section className="flex-1 p-8 pt-20 md:pt-8 overflow-y-auto">
 
         <div className="flex items-center justify-between mb-8">
 
