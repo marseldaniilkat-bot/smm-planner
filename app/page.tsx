@@ -110,7 +110,7 @@ export default function Home() {
     setUser] =
     useState<any>(null);
 
-  useEffect(() => {
+ useEffect(() => {
 
   const unsubscribe =
     onAuthStateChanged(
@@ -120,7 +120,7 @@ export default function Home() {
         setUser(currentUser);
 
         if (currentUser) {
-                    await loadPosts();
+          await loadPosts(currentUser.uid);
         }
       }
     );
@@ -131,14 +131,19 @@ export default function Home() {
 
          
 
-  const loadPosts = async () => {
-  if (!user) return;
+  const loadPosts = async (
+  currentUid?: string
+) => {
+
+  const uid =
+    currentUid || user?.uid;
+
+  if (!uid) return;
 
   const q = query(
     collection(db, "posts"),
-    where("userId", "==", user.uid)
+    where("userId", "==", uid)
   );
-
   const querySnapshot = await getDocs(q);
 
   const loadedPosts: any[] = [];
@@ -210,7 +215,7 @@ export default function Home() {
       newPost
     );
 
-    await loadPosts();
+   await loadPosts(user?.uid);
 
     setTitle("");
     setDescription("");
