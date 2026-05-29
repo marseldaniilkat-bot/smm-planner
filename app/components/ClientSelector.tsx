@@ -11,12 +11,15 @@ interface ClientSelectorProps {
   onSelect: (
     id: number
   ) => void;
+
+  onAddClient: () => void;
 }
 
 export default function ClientSelector({
   clients,
   selectedClientId,
   onSelect,
+  onAddClient,
 }: ClientSelectorProps) {
 
   return (
@@ -60,6 +63,22 @@ export default function ClientSelector({
           </button>
         );
       })}
+
+      <button
+        onClick={onAddClient}
+        className="min-w-[240px] rounded-[30px] p-6 border-2 border-dashed border-violet-300 bg-white text-violet-600 shrink-0"
+      >
+
+        <div className="text-4xl mb-2">
+          +
+        </div>
+
+        <h2 className="text-xl font-bold">
+          Новый клиент
+        </h2>
+
+      </button>
+
     </div>
   );
 }

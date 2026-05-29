@@ -55,10 +55,12 @@ export default function Calendar({
       onDragEnd={onDragEnd}
     >
 
-      <div
-        id="calendar-export"
-        className="bg-white border border-[#ece7e4] rounded-[40px] overflow-hidden"
-      >
+      <div className="overflow-x-auto">
+
+  <div
+    id="calendar-export"
+    className="bg-white border border-[#ece7e4] rounded-[40px] overflow-hidden min-w-[1200px]"
+  >
 
         {/* WEEK */}
 
@@ -230,7 +232,7 @@ export default function Calendar({
           })}
         </div>
       </div>
-
+</div>
     </DragDropContext>
   );
 }

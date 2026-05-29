@@ -11,6 +11,7 @@ import {
   updateDoc,
   query,
   where,
+  setDoc,
 } from "firebase/firestore";
 
 import {
@@ -69,6 +70,40 @@ export default function Home() {
   const [clients,
     setClients] =
     useState(initialClients);
+   const addClient = async () => {
+
+  const clientName =
+    prompt(
+      "Введите название клиента"
+    );
+
+  if (
+    !clientName ||
+    !user
+  ) return;
+
+  const clientId =
+    Date.now();
+
+  const newClient = {
+    id: clientId,
+    name: clientName,
+    userId: user.uid,
+  };
+
+  await setDoc(
+    doc(
+      db,
+      "clients",
+      String(clientId)
+    ),
+    newClient
+  );
+
+  await loadClients(
+    user.uid
+  );
+};
 
   const [currentPage,
     setCurrentPage] =
@@ -119,9 +154,16 @@ export default function Home() {
 
         setUser(currentUser);
 
-        if (currentUser) {
-          await loadPosts(currentUser.uid);
-        }
+       if (currentUser) {
+
+  await loadPosts(
+    currentUser.uid
+  );
+
+  await loadClients(
+    currentUser.uid
+  );
+}
       }
     );
 
@@ -144,22 +186,63 @@ export default function Home() {
     collection(db, "posts"),
     where("userId", "==", uid)
   );
-  const querySnapshot = await getDocs(q);
+
+  const querySnapshot =
+    await getDocs(q);
 
   const loadedPosts: any[] = [];
 
-  querySnapshot.forEach((docItem) => {
-    loadedPosts.push({
-      id: docItem.id,
-      ...docItem.data(),
-    });
-  });
+  querySnapshot.forEach(
+    (docItem) => {
+
+      loadedPosts.push({
+        id: docItem.id,
+        ...docItem.data(),
+      });
+    }
+  );
 
   setPosts(loadedPosts);
 };
-  const getColorByStatus = (
-    status: string
-  ) => {
+
+const loadClients = async (
+  currentUid?: string
+) => {
+
+  const uid =
+    currentUid || user?.uid;
+
+  if (!uid) return;
+
+  const q = query(
+    collection(db, "clients"),
+    where("userId", "==", uid)
+  );
+
+  const querySnapshot =
+    await getDocs(q);
+
+  const loadedClients: any[] = [];
+
+  querySnapshot.forEach(
+    (docItem) => {
+
+      loadedClients.push({
+        id: Number(docItem.id),
+        ...docItem.data(),
+      });
+    }
+  );
+
+  setClients(
+  loadedClients
+);
+
+};
+
+const getColorByStatus = (
+  status: string
+) => {
 
     switch (status) {
 
@@ -282,22 +365,49 @@ export default function Home() {
     await loadPosts();
   };
 
-  const renameClient = (
-    id: number,
-    name: string
-  ) => {
+const renameClient = async (
+  id: number,
+  name: string
+) => {
 
-    setClients((prev) =>
-      prev.map((client) =>
-        client.id === id
-          ? {
-              ...client,
-              name,
-            }
-          : client
-      )
-    );
-  };
+  setClients((prev) =>
+    prev.map((client) =>
+      client.id === id
+        ? {
+            ...client,
+            name,
+          }
+        : client
+    )
+  );
+
+  await updateDoc(
+    doc(
+      db,
+      "clients",
+      String(id)
+    ),
+    {
+      name,
+    }
+  );
+};
+const deleteClient = async (
+  id: number
+) => {
+
+  await deleteDoc(
+    doc(
+      db,
+      "clients",
+      String(id)
+    )
+  );
+
+  await loadClients(
+    user?.uid
+  );
+};
 
   const nextMonth = () => {
 
@@ -418,15 +528,18 @@ export default function Home() {
 
             </div>
 
-            <ClientSelector
-              clients={clients}
-              selectedClientId={
-                selectedClientId
-              }
-              onSelect={
-                setSelectedClientId
-              }
-            />
+           <ClientSelector
+  clients={clients}
+  selectedClientId={
+    selectedClientId
+  }
+  onSelect={
+    setSelectedClientId
+  }
+  onAddClient={
+    addClient
+  }
+/>
 
             <Calendar
               posts={posts}
@@ -470,11 +583,14 @@ export default function Home() {
           "Клиенты" && (
 
           <ClientsPage
-            clients={clients}
-            renameClient={
-              renameClient
-            }
-          />
+  clients={clients}
+  renameClient={
+    renameClient
+  }
+  deleteClient={
+    deleteClient
+  }
+/>
         )}
 
       </section>
