@@ -59,8 +59,13 @@ export default function RightPanel({
 
   return (
 
-    <aside className="w-[400px] bg-white border-l border-[#ece7e4] p-8 overflow-y-auto">
-
+<aside
+  className={
+    selectedPost
+      ? "w-[320px] transition-all duration-300 bg-white border-l border-[#ece7e4] p-8 overflow-y-auto"
+      : "w-0 overflow-hidden transition-all duration-300"
+  }
+>
       {selectedPost ? (
 
         <>

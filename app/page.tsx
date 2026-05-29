@@ -38,15 +38,15 @@ import Auth from "./components/Auth";
 const initialClients = [
   {
     id: 1,
-    name: "Kenwood",
+    name: "1 клиент",
   },
   {
     id: 2,
-    name: "Коуч",
+    name: "2 клиент",
   },
   {
     id: 3,
-    name: "Hair Stylist",
+    name: "3 клиент",
   },
 ];
 
