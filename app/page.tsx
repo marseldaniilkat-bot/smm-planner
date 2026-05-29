@@ -9,6 +9,8 @@ import {
   deleteDoc,
   doc,
   updateDoc,
+  query,
+  where,
 } from "firebase/firestore";
 
 import {
@@ -110,46 +112,46 @@ export default function Home() {
 
   useEffect(() => {
 
-    loadPosts();
+  const unsubscribe =
+    onAuthStateChanged(
+      auth,
+      async (currentUser) => {
 
-    const unsubscribe =
-      onAuthStateChanged(
-        auth,
-        (currentUser) => {
+        setUser(currentUser);
 
-          setUser(
-            currentUser
-          );
+        if (currentUser) {
+                    await loadPosts();
         }
-      );
-
-    return () =>
-      unsubscribe();
-
-  }, []);
-
-  const loadPosts = async () => {
-
-    const querySnapshot =
-      await getDocs(
-        collection(db, "posts")
-      );
-
-    const loadedPosts: any[] = [];
-
-    querySnapshot.forEach(
-      (docItem) => {
-
-        loadedPosts.push({
-          id: docItem.id,
-          ...docItem.data(),
-        });
       }
     );
 
-    setPosts(loadedPosts);
-  };
+  return () => unsubscribe();
 
+}, []);
+
+         
+
+  const loadPosts = async () => {
+  if (!user) return;
+
+  const q = query(
+    collection(db, "posts"),
+    where("userId", "==", user.uid)
+  );
+
+  const querySnapshot = await getDocs(q);
+
+  const loadedPosts: any[] = [];
+
+  querySnapshot.forEach((docItem) => {
+    loadedPosts.push({
+      id: docItem.id,
+      ...docItem.data(),
+    });
+  });
+
+  setPosts(loadedPosts);
+};
   const getColorByStatus = (
     status: string
   ) => {
